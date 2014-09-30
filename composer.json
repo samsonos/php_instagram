@@ -1,7 +1,7 @@
 {
     "name":"samsonos/php_instagram",
     "description": "SamsonPHP Instagram module",
-    "keywords": [ "php", "instaram", "samsonos", "samsonphp"],
+    "keywords": [ "php", "instagram", "samsonos", "samsonphp"],
     "authors":[
         {
             "name":"Nikita Kotenko",
