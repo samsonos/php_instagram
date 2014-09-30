@@ -26,10 +26,15 @@ class Instagram extends CompressableService
 
     /**
      * Get images by Tag
-     * @param array string list of images
+     *
+     * @param string $tag
+     * @param bool   $getInstaResult Get Instagram answer without conversion
+     *
+     * @return array list of images url
      */
-    protected function getImagesByTag($tag)
+    public function listByTag($tag, $getInstaResult = false)
     {
+        $return = array();
         // Create url for query
         $url = 'https://api.instagram.com/v1/tags/'.$tag.'/media/recent?client_id='.$this->appId;
         // Init Curl
@@ -44,11 +49,39 @@ class Instagram extends CompressableService
         $results = json_decode(curl_exec($ch), true);
         // lose Curl session
         curl_close($ch);
-        //Now parse through the $results array to display your results...
-        foreach($results['data'] as $item) {
-            $image_link = $item['images']['low_resolution']['url'];
-            echo '<img src="' . $image_link . '" />';
+
+        if ($getInstaResult) return $results;
+
+        if (sizeof($results) && isset($results['data'])&& is_array($results['data']) && sizeof($results['data'])) {
+            //Now parse through the $results array
+            foreach($results['data'] as $item) {
+                $return[] = $item['images'];
+            }
         }
+        return $return;
+    }
+
+    /**
+     * Creating html view
+     * @param string $tag Hashtag
+     * @param string $itemView View for image item
+     * @param string $indexView Main container
+     *
+     * @return string Html view of images
+     */
+    public function htmlByTag($tag, $itemView = 'imageslist/item.vphp', $indexView = 'imageslist/index.vphp')
+    {
+        $list = '';
+        // Get list of images by tag
+        $results = $this->listByTag($tag, true);
+        // Create hmlt view list
+        if (sizeof($results) && isset($results['data'])&& is_array($results['data']) && sizeof($results['data'])) {
+            foreach ($results['data'] as $item) {
+                $list .= $this->view($itemView)->img($item['images']['low_resolution']['url'])->output();
+            }
+        }
+
+        return $this->view($indexView)->list($list)->output();
     }
 }
  

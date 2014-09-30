@@ -1,0 +1,4 @@
+<li class="__nsagra_images_item">
+    <img src="<?php v('img')?>">
+</li>
+  
