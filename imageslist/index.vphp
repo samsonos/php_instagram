@@ -1,4 +1,4 @@
-<ul class="__imstagram_images_list">
+<ul class="__instagram_images_list">
     <?php iv('list'); ?>
 </ul>
   

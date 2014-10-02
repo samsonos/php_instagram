@@ -69,15 +69,18 @@ class Instagram extends CompressableService
      *
      * @return string Html view of images
      */
-    public function htmlByTag($tag, $itemView = 'imageslist/item.vphp', $indexView = 'imageslist/index.vphp')
+    public function htmlByTag($tag, $limit = 100, $itemView = 'imageslist/item.vphp', $indexView = 'imageslist/index.vphp')
     {
         $list = '';
         // Get list of images by tag
         $results = $this->listByTag($tag, true);
         // Create hmlt view list
+        $count = 0;
         if (sizeof($results) && isset($results['data'])&& is_array($results['data']) && sizeof($results['data'])) {
             foreach ($results['data'] as $item) {
-                $list .= $this->view($itemView)->img($item['images']['low_resolution']['url'])->output();
+                $list .= $this->view($itemView)->link($item['link'])->img($item['images']['low_resolution']['url'])->output();
+                $count++;
+                if ($count >= $limit) break;
             }
         }
 
