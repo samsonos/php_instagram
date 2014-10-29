@@ -36,7 +36,7 @@ class Instagram extends CompressableService
     {
         $return = array();
         // Create url for query
-        $url = 'https://api.instagram.com/v1/tags/'.$tag.'/media/recent?client_id='.$this->appId;
+        $url = 'https://api.instagram.com/v1/tags/'.urlencode($tag).'/media/recent?client_id='.$this->appId;
         // Init Curl
         $ch = curl_init();
         curl_setopt_array($ch, array(
