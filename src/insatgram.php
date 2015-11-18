@@ -29,14 +29,19 @@ class Instagram extends CompressableService
      *
      * @param string $tag
      * @param bool   $getInstaResult Get Instagram answer without conversion
+     * @param string $minTagID Get posts after post with this id
      *
      * @return array list of images url
      */
-    public function listByTag($tag, $getInstaResult = false)
+    public function listByTag($tag, $getInstaResult = false, $minTagID = false)
     {
         $return = array();
+        $params = '';
+        if ($minTagID) {
+            $params = '&min_tag_id='.$minTagID;
+        }
         // Create url for query
-        $url = 'https://api.instagram.com/v1/tags/'.urlencode($tag).'/media/recent?client_id='.$this->appId;
+        $url = 'https://api.instagram.com/v1/tags/'.urlencode($tag).'/media/recent?client_id='.$this->appId.$params;
         // Init Curl
         $ch = curl_init();
         curl_setopt_array($ch, array(
