@@ -33,13 +33,23 @@ class Instagram extends CompressableService
      *
      * @return array list of images url
      */
-    public function listByTag($tag, $getInstaResult = false, $minTagID = false)
+    public function listByTag($tag, $getInstaResult = false, $count = 0, $maxTagID = null, $minTagID = null)
     {
         $return = array();
         $params = '';
+
         if ($minTagID) {
-            $params = '&min_tag_id='.$minTagID;
+            $params .= '&min_tag_id='.$minTagID;
         }
+
+        if ($maxTagID) {
+            $params .= '&max_tag_id='.$maxTagID;
+        }
+
+        if ($count) {
+            $params .= '&count='.$count;
+        }
+
         // Create url for query
         $url = 'https://api.instagram.com/v1/tags/'.urlencode($tag).'/media/recent?client_id='.$this->appId.$params;
         // Init Curl
