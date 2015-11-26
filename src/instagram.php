@@ -101,5 +101,61 @@ class Instagram extends CompressableService
 
         return $this->view($indexView)->list($list)->output();
     }
+
+    /**
+     * @param $id int Media identifier
+     * @param $accessToken string Auth token
+     * @param string $method Type of request
+     * @return mixed Request result
+     */
+    public function likeMedia($id, $accessToken, $method = 'POST')
+    {
+        $url = 'https://api.instagram.com/v1/media/'.$id.'/likes?access_token='.$accessToken.'&client_id='.$this->appId;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 90);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+
+        switch ($method) {
+            case 'POST':
+                curl_setopt($ch, CURLOPT_POST, true);
+                break;
+            case 'DELETE':
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+                break;
+        }
+        $results = json_decode(curl_exec($ch), true);
+
+        return $results;
+    }
+
+    /**
+     * Find info about media
+     * @param $id
+     * @return mixed
+     */
+    public function mediaById($id)
+    {
+        // Create url for query
+        $url = 'https://api.instagram.com/v1/media/'.urlencode($id).'?client_id='.$this->appId;
+        // Init Curl
+        $ch = curl_init();
+        curl_setopt_array($ch, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => 2
+        ));
+
+        // Get result of query and decode
+        $results = json_decode(curl_exec($ch), true);
+        // lose Curl session
+        curl_close($ch);
+
+        return $results;
+    }
 }
  
