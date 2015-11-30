@@ -184,5 +184,33 @@ class Instagram extends CompressableService
 
         return $results;
     }
+    
+    /**
+     * Check if current are follow relationship with another user
+     * @param int $user_id Target user identifier
+     * @param string $access_token Authenticated user token
+     * @return bool
+     */
+    public function isFollowing($user_id, $access_token)
+    {
+        // Create url for query
+        $url = 'https://api.instagram.com/v1/users/'.$user_id.'/relationship?access_token='.$access_token.'&client_id='.$this->appId;
+
+        // Init Curl
+        $ch = curl_init();
+        curl_setopt_array($ch, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => 2
+        ));
+
+        // Get result of query and decode
+        $results = json_decode(curl_exec($ch), true);
+        // lose Curl session
+        curl_close($ch);
+
+        return (isset($results['data']['incoming_status']) && $results['data']['incoming_status'] == 'followed_by');
+    }
 }
  
