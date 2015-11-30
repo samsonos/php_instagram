@@ -157,5 +157,32 @@ class Instagram extends CompressableService
 
         return $results;
     }
+    
+    /**
+     * Set authenticated user relation with another user by id
+     * @param int $user_id Target user identifier
+     * @param string $access_token Authenticated user token
+     * @param string $action Relationship action. Can be follow | unfollow | approve | ignore
+     * @return mixed Request result
+     */
+    public function setUserRelationship($user_id, $access_token, $action = 'follow')
+    {
+        $url = 'https://api.instagram.com/v1/users/'.$user_id.'/relationship?access_token='.$access_token.'&client_id='.$this->appId;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 90);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+
+        // This is POST request
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, "action=".$action);
+
+        $results = json_decode(curl_exec($ch), true);
+
+        return $results;
+    }
 }
  
