@@ -210,7 +210,7 @@ class Instagram extends CompressableService
         // lose Curl session
         curl_close($ch);
 
-        return (isset($results['data']['incoming_status']) && $results['data']['incoming_status'] == 'followed_by');
+        return (isset($results['data']['outgoing_status']) && $results['data']['outgoing_status'] == 'follows');
     }
 }
  
