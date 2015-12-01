@@ -24,6 +24,9 @@ class Instagram extends CompressableService
     /** Your application secret code */
     public $appSecret;
 
+    /** @var string Default access toke for tags requests */
+    public $accessToken;
+
     /**
      * Get images by Tag
      *
@@ -51,7 +54,12 @@ class Instagram extends CompressableService
         }
 
         // Create url for query
-        $url = 'https://api.instagram.com/v1/tags/'.urlencode($tag).'/media/recent?client_id='.$this->appId.$params;
+        if (isset($this->accessToken)) {
+            $url = 'https://api.instagram.com/v1/tags/'.urlencode($tag).'/media/recent?access_token='.$this->accessToken.$params;
+        } else {
+            $url = 'https://api.instagram.com/v1/tags/'.urlencode($tag).'/media/recent?client_id='.$this->appId.$params;
+        }
+
         // Init Curl
         $ch = curl_init();
         curl_setopt_array($ch, array(
@@ -140,7 +148,12 @@ class Instagram extends CompressableService
     public function mediaById($id)
     {
         // Create url for query
-        $url = 'https://api.instagram.com/v1/media/'.urlencode($id).'?client_id='.$this->appId;
+        if (isset($this->accessToken)) {
+            $url = 'https://api.instagram.com/v1/media/'.urlencode($id).'?access_token='.$this->accessToken;
+        } else {
+            $url = 'https://api.instagram.com/v1/media/'.urlencode($id).'?client_id='.$this->appId;
+        }
+
         // Init Curl
         $ch = curl_init();
         curl_setopt_array($ch, array(
@@ -157,7 +170,7 @@ class Instagram extends CompressableService
 
         return $results;
     }
-    
+
     /**
      * Set authenticated user relation with another user by id
      * @param int $user_id Target user identifier
@@ -184,7 +197,7 @@ class Instagram extends CompressableService
 
         return $results;
     }
-    
+
     /**
      * Check if current are follow relationship with another user
      * @param int $user_id Target user identifier
@@ -213,4 +226,3 @@ class Instagram extends CompressableService
         return (isset($results['data']['outgoing_status']) && $results['data']['outgoing_status'] == 'follows');
     }
 }
- 
