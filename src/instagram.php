@@ -225,4 +225,116 @@ class Instagram extends CompressableService
 
         return (isset($results['data']['outgoing_status']) && $results['data']['outgoing_status'] == 'follows');
     }
+
+    /**
+     * Create instagram subscription
+     * @param $object string Subscribe object
+     * @param $aspect string Subscribe aspect
+     * @param $verify_token string Verify token
+     * @param $callback string Callback url
+     * @param $object_id string Subscribing object identifier
+     * @return mixed
+     */
+    public function subscribe($object, $aspect, $verify_token, $callback, $object_id = '')
+    {
+        $url = 'https://api.instagram.com/v1/subscriptions/';
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 90);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+
+        $postFields = "client_id=".$this->appId.
+            "&client_secret=".$this->appSecret.
+            "&object=".$object.
+            "&aspect=".$aspect.
+            "&verify_token=".$verify_token.
+            "&callback_url=".$callback;
+
+        if (sizeof($object_id)) {
+            $postFields .= '&object_id='.$object_id;
+        }
+
+        // This is POST request
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+
+        // Make curl request and get json result
+        $response = curl_exec($ch);
+        $results = json_decode($response, true);
+
+        curl_close($ch);
+
+        return $results;
+    }
+
+    /**
+     * Get list of subscribes of current instagram application
+     * @return mixed
+     */
+    public function getSubscriptions()
+    {
+        // Create url for query
+        $url = 'https://api.instagram.com/v1/subscriptions?client_secret='.$this->appSecret.'&client_id='.$this->appId;
+
+        // Init Curl
+        $ch = curl_init();
+        curl_setopt_array($ch, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => 2
+        ));
+
+        // Get result of query and decode
+        $results = json_decode(curl_exec($ch), true);
+        // lose Curl session
+        curl_close($ch);
+
+        return $results;
+    }
+
+    /**
+     * @param string $id Subscription identifier for deleting
+     * @param string $object Subscription object for deleting
+     * @param string $object_id Media or user identifier for deleting subscription
+     * @return mixed Request result in json format
+     */
+    public function deleteSubscription($id = '', $object = 'all', $object_id = '')
+    {
+        if (sizeof($object_id)) {
+            $list = $this->getSubscriptions();
+
+            // Try to find subscription for deleting
+            foreach ($list['data'] as $item) {
+                if ($item['object_id'] == $object_id) {
+                    $id = $item['id'];
+                    break;
+                }
+            }
+        }
+
+        // If we have subscription for deleting
+        if (sizeof($id)) {
+            $url = 'https://api.instagram.com/v1/subscriptions?client_secret='.$this->appSecret.'&client_id='.$this->appId.'&id='.$id;
+        } else {
+            // Delete all subscriptions for selected object
+            $url = 'https://api.instagram.com/v1/subscriptions?client_secret='.$this->appSecret.'&client_id='.$this->appId.'&object='.$object;
+        }
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 90);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+
+        $results = json_decode(curl_exec($ch), true);
+
+        return $results;
+    }
 }
