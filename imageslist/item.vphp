@@ -1,4 +1,0 @@
-<li class="__insagram_images_item">
-    <a href="<?php v('link')?>" target="_blank"><img src="<?php v('img')?>"></a>
-</li>
-  
