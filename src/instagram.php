@@ -3,11 +3,11 @@
  * Created by Vitaly Iegorov <egorov@samsonos.com>
  * on 11.04.14 at 15:17
  */
- namespace samson\instagram;
+namespace samson\instagram;
 
- use samson\core\CompressableService;
+use samson\core\CompressableService;
 
- /**
+/**
  * Class for  operations with Instagram
  * @author Nikita Kotenko <kotenko@samsonos.com>
  * @copyright 2014 SamsonOS
@@ -41,24 +41,34 @@ class Instagram extends CompressableService
         $return = array();
         $params = '';
 
+        $sigParams = array();
+
         if ($minTagID) {
             $params .= '&min_tag_id='.$minTagID;
+            $sigParams['min_tag_id'] = $minTagID;
         }
 
         if ($maxTagID) {
             $params .= '&max_tag_id='.$maxTagID;
+            $sigParams['max_tag_id'] = $maxTagID;
         }
 
         if ($count) {
             $params .= '&count='.$count;
+            $sigParams['count'] = $count;
         }
+
+        // Create signature
+        $signature = $this->generateSig('/tags/'.urlencode($tag).'/media/recent', $sigParams);
 
         // Create url for query
         if (isset($this->accessToken)) {
+            $sigParams['access_token'] = $this->accessToken;
             $url = 'https://api.instagram.com/v1/tags/'.urlencode($tag).'/media/recent?access_token='.$this->accessToken.$params;
         } else {
             $url = 'https://api.instagram.com/v1/tags/'.urlencode($tag).'/media/recent?client_id='.$this->appId.$params;
         }
+        $url .= '&sig='.$signature;
 
         // Init Curl
         $ch = curl_init();
@@ -112,13 +122,15 @@ class Instagram extends CompressableService
 
     /**
      * @param $id int Media identifier
-     * @param $accessToken string Auth token
+     * @param $access_token string Auth token
      * @param string $method Type of request
      * @return mixed Request result
      */
-    public function likeMedia($id, $accessToken, $method = 'POST')
+    public function likeMedia($id, $access_token, $method = 'POST')
     {
-        $url = 'https://api.instagram.com/v1/media/'.$id.'/likes?access_token='.$accessToken.'&client_id='.$this->appId;
+        $sigParams = array('access_token' => $access_token);
+        $signature = $this->generateSig('/media/'.$id.'/likes', $sigParams);
+        $url = 'https://api.instagram.com/v1/media/'.$id.'/likes?access_token='.$access_token.'&sig='.$signature;
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
@@ -147,12 +159,17 @@ class Instagram extends CompressableService
      */
     public function mediaById($id)
     {
+        $sigParams = array();
         // Create url for query
         if (isset($this->accessToken)) {
             $url = 'https://api.instagram.com/v1/media/'.urlencode($id).'?access_token='.$this->accessToken;
+            $sigParams['access_token'] = $this->accessToken;
         } else {
             $url = 'https://api.instagram.com/v1/media/'.urlencode($id).'?client_id='.$this->appId;
         }
+        $signature = $this->generateSig('/media/'.urlencode($id), $sigParams);
+
+        $url .= '&sig='.$signature;
 
         // Init Curl
         $ch = curl_init();
@@ -180,7 +197,9 @@ class Instagram extends CompressableService
      */
     public function setUserRelationship($user_id, $access_token, $action = 'follow')
     {
-        $url = 'https://api.instagram.com/v1/users/'.$user_id.'/relationship?access_token='.$access_token.'&client_id='.$this->appId;
+        $sigParams = array('access_token' => $access_token, 'action' => $action);
+        $signature = $this->generateSig('/users/'.$user_id.'/relationship', $sigParams);
+        $url = 'https://api.instagram.com/v1/users/'.$user_id.'/relationship?access_token='.$access_token.'&sig='.$signature;
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
@@ -206,8 +225,10 @@ class Instagram extends CompressableService
      */
     public function isFollowing($user_id, $access_token)
     {
+        $sigParams = array('access_token' => $access_token);
+        $signature = $this->generateSig('/users/'.$user_id.'/relationship', $sigParams);
         // Create url for query
-        $url = 'https://api.instagram.com/v1/users/'.$user_id.'/relationship?access_token='.$access_token.'&client_id='.$this->appId;
+        $url = 'https://api.instagram.com/v1/users/'.$user_id.'/relationship?access_token='.$access_token.'&sig='.$signature;
 
         // Init Curl
         $ch = curl_init();
@@ -336,5 +357,19 @@ class Instagram extends CompressableService
         $results = json_decode(curl_exec($ch), true);
 
         return $results;
+    }
+
+    /**
+     * @param string $endpoint Method name
+     * @param array $params Method params
+     * @return string Generated signature
+     */
+    public function generateSig($endpoint, $params = array()) {
+        $sig = $endpoint;
+        ksort($params);
+        foreach ($params as $key => $val) {
+            $sig .= "|$key=$val";
+        }
+        return hash_hmac('sha256', $sig, $this->appSecret, false);
     }
 }
