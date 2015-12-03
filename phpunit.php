@@ -1,8 +1,8 @@
 <?php
 /**
- * Created by Vitaly Iegorov <egorov@samsonos.com>
- * on 04.08.14 at 17:43
- */
+     * Created by Vitaly Iegorov <egorov@samsonos.com>
+     * on 04.08.14 at 17:43
+     */
 
 /** Set composer autoloader */
 require __DIR__.'/vendor/autoload.php';
