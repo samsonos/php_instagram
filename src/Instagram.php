@@ -17,7 +17,7 @@ use samsonphp\event\Event;
 class Instagram extends CompressableService
 {
     /** @var string Instagram API url string */
-    protected $url;
+    protected $url = 'https://api.instagram.com/v1';
 
     /** Module identifier */
     public $id = 'instagram';
@@ -99,9 +99,6 @@ class Instagram extends CompressableService
         if (!isset($this->appId) || !isset($this->appSecret)) {
             // Signal error
             Event::fire('error', array($this, 'Cannot initialize Instagram module - API keys does not exists'));
-        } else {
-            // Create default API url
-            $this->url = 'https://api.instagram.com/v1';
         }
 
         // Call parent initialization
