@@ -155,7 +155,9 @@ class InstagramTest extends \PHPUnit_Framework_TestCase
     public function testRequestClass()
     {
         $request = new Request();
-        $response = $request->get('url');
+        $request->get('url');
+        $request->get('url', array('action' => 'action'), 'POST');
+        $request->get('url', array(), 'DELETE');
     }
 }
  
