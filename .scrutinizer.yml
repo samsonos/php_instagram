@@ -16,4 +16,13 @@ build:
     environment:
         php:
             version: 5.5
+            
+    tests:
+        override:
+            #- 'vendor/bin/behat -p test'
+            -
+                command: 'phpunit --coverage-clover=coverage.clover'
+                coverage:
+                    file: 'coverage.clover'
+                    format: 'php-clover'
 
