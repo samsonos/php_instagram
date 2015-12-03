@@ -7,7 +7,7 @@ namespace samson\instagram\tests;
 
 define('__VENDOR_PATH', __DIR__.'/../../../../');
 require_once(__VENDOR_PATH.'samsonos/php/core/samson.php');
-require_once(__DIR__.'/../Instagram1.php');
+require_once(__DIR__.'/../Instagram.php');
 
 class InstagramTest extends \PHPUnit_Framework_TestCase
 {
