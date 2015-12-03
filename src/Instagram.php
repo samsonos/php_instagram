@@ -234,7 +234,7 @@ class Instagram extends CompressableService
      * @param $object_id string Subscribing object identifier
      * @return mixed
      */
-    public function subscribe($object, $aspect, $verify_token, $callback, $object_id = '')
+    public function subscribe($object, $aspect, $verify_token, $callback, $object_id = null)
     {
         $url = $this->url.'/subscriptions';
         $post = array(
@@ -278,7 +278,7 @@ class Instagram extends CompressableService
      * @param string $object_id Media or user identifier for deleting subscription
      * @return mixed Request result in json format
      */
-    public function deleteSubscription($id = '', $object = 'all', $object_id = '')
+    public function deleteSubscription($id = '', $object = 'all', $object_id = null)
     {
         $url = $this->url.'/subscriptions?client_secret='.$this->appSecret.'&client_id='.$this->appId;
 
