@@ -37,14 +37,11 @@ class Request
         ));
 
         // Add custom parameters switch to method
-        switch ($method) {
-            case 'POST':
-                // Set curl post option
-                curl_setopt($curl, CURLOPT_POST, true);
-                curl_setopt($curl, CURLOPT_POSTFIELDS, $this->arrayToParam($params));
-                break;
-            case 'DELETE': curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE'); break;
-            default: break;
+        if ($method == 'POST') {
+            curl_setopt($curl, CURLOPT_POST, true);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $this->arrayToParam($params));
+        } elseif ($method == 'DELETE') {
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
         }
 
         // Get result of request
