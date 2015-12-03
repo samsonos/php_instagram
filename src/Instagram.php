@@ -35,6 +35,42 @@ class Instagram extends CompressableService
     public $request;
 
     /**
+     * Find subscription identifier by media id
+     * @param string $object_id Media id
+     * @return string Subscription id
+     */
+    protected function findObjectFromSubscription($object_id)
+    {
+        /** @var string $id Subscription identifier */
+        $id = '';
+
+        $list = $this->getSubscriptions();
+
+        // Try to find subscription for deleting
+        foreach ($list['data'] as $item) {
+            if ($item['object_id'] == $object_id) {
+                $id = $item['id'];
+                break;
+            }
+        }
+
+        return $id;
+    }
+
+    /**
+     * Append application or access token to url
+     * @param $url
+     */
+    protected function appendToken(& $url)
+    {
+        if (isset($this->accessToken)) {
+            $url .= '?access_token='.$this->accessToken;
+        } else {
+            $url .= '?client_id='.$this->appId;
+        }
+    }
+
+    /**
      * Module initialization
      * @param array $params
      * @return bool
@@ -77,10 +113,9 @@ class Instagram extends CompressableService
         // Create url for query
         if (isset($this->accessToken)) {
             $params['access_token'] = $this->accessToken;
-            $url .= '?access_token='.$this->accessToken;
-        } else {
-            $url .= '?client_id='.$this->appId;
         }
+
+        $this->appendToken($url);
 
         // Create signature
         $signature = $this->generateSig($endpoint, $params);
@@ -131,11 +166,10 @@ class Instagram extends CompressableService
         $sigParams = array();
         // Create url for query
         if (isset($this->accessToken)) {
-            $url .= '?access_token='.$this->accessToken;
             $sigParams['access_token'] = $this->accessToken;
-        } else {
-            $url .= '?client_id='.$this->appId;
         }
+
+        $this->appendToken($url);
         $signature = $this->generateSig($endpoint, $sigParams);
 
         $url .= '&sig='.$signature;
@@ -248,16 +282,9 @@ class Instagram extends CompressableService
     {
         $url = $this->url.'/subscriptions?client_secret='.$this->appSecret.'&client_id='.$this->appId;
 
+        // Try to find subscription id by media id
         if (sizeof($object_id)) {
-            $list = $this->getSubscriptions();
-
-            // Try to find subscription for deleting
-            foreach ($list['data'] as $item) {
-                if ($item['object_id'] == $object_id) {
-                    $id = $item['id'];
-                    break;
-                }
-            }
+            $id = $this->findObjectFromSubscription($object_id);
         }
 
         // Delete all subscriptions for selected parameter

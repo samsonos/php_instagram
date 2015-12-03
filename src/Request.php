@@ -8,7 +8,11 @@
 
 namespace samson\instagram;
 
-
+/**
+ * Class for creating Instagram API requests
+ * Class Request
+ * @package samson\instagram
+ */
 class Request
 {
     /**
@@ -37,20 +41,7 @@ class Request
             case 'POST':
                 // Set curl post option
                 curl_setopt($curl, CURLOPT_POST, true);
-                
-                // If we have some post parameters
-                if (sizeof($params)) {
-                    // Create post parameters as sting
-                    $postParams = '';
-                    foreach ($params as $key => $value) {
-                        $postParams .= $key.'='.$value.'&';
-                    }
-                    $postParams = substr($postParams, 0, -1);
-                    
-                    // Add curl option with parameters string
-                    curl_setopt($curl, CURLOPT_POSTFIELDS, $postParams);
-                }
-                
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $this->arrayToParam($params));
                 break;
             case 'DELETE': curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE'); break;
             default: break;
@@ -63,5 +54,20 @@ class Request
         curl_close($curl);
 
         return $response;
+    }
+
+    public function arrayToParam($array)
+    {
+        // Create parameters as sting
+        $param = '';
+
+        if (sizeof($array)) {
+            foreach ($array as $key => $value) {
+                $param .= $key.'='.$value.'&';
+            }
+            $param = substr($param, 0, -1);
+        }
+
+        return $param;
     }
 }
