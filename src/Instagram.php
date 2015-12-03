@@ -1,8 +1,8 @@
 <?php
 /**
- * Created by Vitaly Iegorov <egorov@samsonos.com>
- * on 11.04.14 at 15:17
- */
+     * Created by Vitaly Iegorov <egorov@samsonos.com>
+     * on 11.04.14 at 15:17
+     */
 namespace samson\instagram;
 
 use samson\core\CompressableService;
@@ -107,7 +107,7 @@ class Instagram extends CompressableService
         // Create url parameters string
         $paramsUrl = '';
         foreach ($params as $key => $value) {
-            $paramsUrl .= '&' . $key . '=' . $value;
+            $paramsUrl .= '&'.$key.'='.$value;
         }
 
         // Create url for query
