@@ -45,6 +45,7 @@ $posts = $instagram->listByTag($myTag, array('count' => 10));
 This method uses Instagram [Like Endpoints](https://www.instagram.com/developer/endpoints/likes/) API.
 For using it you just need to know users access token for your application, and media identifier.
 Notice, that this method can toggle like status, so if you create this request for already liked media, this media will unliked.
+
 Simple example:
 
 ```php
@@ -63,6 +64,7 @@ $posts = $instagram->likeMedia($myMediaID, 'ACCESS_TOKEN');
 This method uses Instagram [Relationship Endpoints](https://www.instagram.com/developer/endpoints/relationships/) API.
 You can user relationships using method ``` setUserRelationship($user_id, $access_token, $action = 'follow') ```.
 For using this method you need to know user instagram identifier and his access token. The third parameter defines the relationship.
+
 Simple example:
 
 ```php
@@ -81,7 +83,8 @@ $posts = $instagram->setUserRelationship($user_id, 'ACCESS_TOKEN', 'unfollow');
 This method uses Instagram [User Subscriptions](https://www.instagram.com/developer/subscriptions/) API.
 You are able to create subscriptions for updates of your authenticated users.
 Use method ``` subscribe($object, $aspect, $verify_token, $callback, $object_id = null) ``` for creating it.
-Read more about the parameters
+Read more about the parameters in instagram API [documentation] (https://www.instagram.com/developer/subscriptions/)
+
 Simple example:
 
 ```php
