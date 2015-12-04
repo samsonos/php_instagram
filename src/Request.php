@@ -16,6 +16,17 @@ namespace samson\instagram;
 class Request
 {
     /**
+     * @var array Curl basic options
+     */
+    protected $curlParams = array(
+        CURLOPT_CONNECTTIMEOUT => 20,
+        CURLOPT_TIMEOUT => 90,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_HEADER => false
+    );
+
+    /**
      * @param string $url Request url
      * @param array $params Request params (for POST requests)
      * @param string $method Request method
@@ -26,15 +37,11 @@ class Request
         // Init curl
         $curl = curl_init();
 
+        // Set curl url
+        curl_setopt($curl, CURLOPT_URL, $url);
+
         // Set curl options
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $url,
-            CURLOPT_CONNECTTIMEOUT => 20,
-            CURLOPT_TIMEOUT => 90,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_HEADER => false
-        ));
+        curl_setopt_array($curl, $this->curlParams);
 
         // Add custom parameters switch to method
         if ($method == 'POST') {

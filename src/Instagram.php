@@ -129,11 +129,8 @@ class Instagram extends CompressableService
         // Create signature
         $signature = $this->generateSig($endpoint, $params);
 
-        // Create final url
-        $url .= $paramsUrl.'&sig='.$signature;
-
         // Get API response
-        $response = $this->request->get($url);
+        $response = $this->request->get($url.$paramsUrl.'&sig='.$signature);
 
         // Return response decoded to associative array
         return json_decode($response, true);
@@ -224,7 +221,7 @@ class Instagram extends CompressableService
         $endpoint = '/users/'.$user_id.'/relationship';
         $url = $this->url.$endpoint;
         $signature = $this->generateSig($endpoint, array('access_token' => $access_token));
-        $url .= 'access_token='.$access_token.'&sig='.$signature;
+        $url .= '?access_token='.$access_token.'&sig='.$signature;
 
         // Get API response
         $response = $this->request->get($url);

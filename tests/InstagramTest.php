@@ -41,6 +41,21 @@ class InstagramTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn($response);
 
+        $this->instance->accessToken = 'access_token';
+        $list = $this->instance->listByTag('adventure', array('count' => 10));
+
+        // Perform test
+        $this->assertEquals($list, json_decode($response));
+    }
+
+    public function testListToken()
+    {
+        $response = '{[]}';
+
+        $this->request
+            ->method('get')
+            ->willReturn($response);
+
         $list = $this->instance->listByTag('adventure', array('count' => 10));
 
         // Perform test
@@ -71,6 +86,21 @@ class InstagramTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn($response);
 
+        $list = $this->instance->mediaById('id');
+
+        // Perform test
+        $this->assertEquals($list, json_decode($response));
+    }
+
+    public function testMediaToken()
+    {
+        $response = '{[]}';
+
+        $this->request
+            ->method('get')
+            ->willReturn($response);
+
+        $this->instance->accessToken = 'access_token';
         $list = $this->instance->mediaById('id');
 
         // Perform test
@@ -121,7 +151,21 @@ class InstagramTest extends \PHPUnit_Framework_TestCase
 
     public function testDeleteSubscriptions()
     {
-        $response = '{[]}';
+        $response = '{
+    "meta": {
+        "code": 200
+    },
+    "data": [
+        {
+            "id": "1",
+            "type": "subscription",
+            "object": "user",
+            "object_id": "object_id",
+            "aspect": "media",
+            "callback_url": "http://your-callback.com/url/"
+        }
+    ]
+}';
 
         $this->request
             ->method('get')
@@ -130,7 +174,7 @@ class InstagramTest extends \PHPUnit_Framework_TestCase
         $list = $this->instance->deleteSubscription('id', 'object', 'object_id');
 
         // Perform test
-        $this->assertEquals($list, json_decode($response));
+        $this->assertEquals($list, json_decode($response, 1));
     }
 
     public function testIsFollowing()
@@ -155,9 +199,7 @@ class InstagramTest extends \PHPUnit_Framework_TestCase
     public function testRequestClass()
     {
         $request = new Request();
-        $request->get('url');
-        $request->get('url', array('action' => 'action'), 'POST');
-        $request->get('url', array(), 'DELETE');
+        $response = $request->get('url');
     }
 }
  
