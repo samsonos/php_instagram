@@ -41,7 +41,6 @@ class InstagramTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn($response);
 
-        $this->instance->accessToken = 'access_token';
         $list = $this->instance->listByTag('adventure', array('count' => 10));
 
         // Perform test
@@ -56,6 +55,7 @@ class InstagramTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn($response);
 
+        $this->instance->accessToken = 'access_token';
         $list = $this->instance->listByTag('adventure', array('count' => 10));
 
         // Perform test
