@@ -315,8 +315,8 @@ class Instagram extends CompressableService
         $url = 'https://api.instagram.com/oauth/access_token';
 
         $params = array(
-            'client_id' => $this->clientId,
-            'client_secret' => $this->clientSecret,
+            'client_id' => $this->appId,
+            'client_secret' => $this->appSecret,
             'grant_type' => 'authorization_code',
             'redirect_uri' => $redirect_url,
             'code' => $code
