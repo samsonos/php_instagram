@@ -304,6 +304,31 @@ class Instagram extends CompressableService
     }
 
     /**
+     * Authorize user on instagram.
+     *
+     * @param string $code Authentication code
+     * @param string $redirect_url Authentication redirect
+     * @return mixed
+     */
+    public function getUserToken($code, $redirect_url)
+    {
+        $url = 'https://api.instagram.com/oauth/access_token';
+
+        $params = array(
+            'client_id' => $this->appId,
+            'client_secret' => $this->appSecret,
+            'grant_type' => 'authorization_code',
+            'redirect_uri' => $redirect_url,
+            'code' => $code
+        );
+
+        $response = $this->request->get($url, $params, 'POST');
+
+        // Return response decoded to associative array
+        return json_decode($response, true);
+    }
+    
+    /**
      * @param string $endpoint Method name
      * @param array $params Method params
      * @return string Generated signature
