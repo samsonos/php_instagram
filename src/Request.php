@@ -27,6 +27,25 @@ class Request
     );
 
     /**
+     * @param $array
+     * @return string
+     */
+    private function arrayToParam($array)
+    {
+        // Create parameters as sting
+        $param = '';
+
+        if (sizeof($array)) {
+            foreach ($array as $key => $value) {
+                $param .= $key.'='.$value.'&';
+            }
+            $param = substr($param, 0, -1);
+        }
+
+        return $param;
+    }
+
+    /**
      * @param string $url Request url
      * @param array $params Request params (for POST requests)
      * @param string $method Request method
@@ -58,20 +77,5 @@ class Request
         curl_close($curl);
 
         return $response;
-    }
-
-    public function arrayToParam($array)
-    {
-        // Create parameters as sting
-        $param = '';
-
-        if (sizeof($array)) {
-            foreach ($array as $key => $value) {
-                $param .= $key.'='.$value.'&';
-            }
-            $param = substr($param, 0, -1);
-        }
-
-        return $param;
     }
 }
