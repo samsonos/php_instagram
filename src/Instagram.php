@@ -9,30 +9,40 @@ use samson\core\CompressableService;
 use samsonphp\event\Event;
 
 /**
- * Class for  operations with Instagram
+ * Class for  operations with Instagram.
+ *
  * @author Nikita Kotenko <kotenko@samsonos.com>
  * @copyright 2014 SamsonOS
  * @version 0.1
  */
-class Instagram extends CompressableService
+class Instagram
 {
     /** @var string Instagram API url string */
-    protected $url = 'https://api.instagram.com/v1';
+    const DEFAULT_URL = 'https://api.instagram.com/v1';
 
-    /** Module identifier */
-    public $id = 'instagram';
+    /** @var string Your application client id */
+    protected $clientId;
 
-    /** Your application client id */
-    public $appId;
-
-    /** Your application client secret code */
-    public $appSecret;
+    /** @var string Your application client secret code */
+    protected $clientSecret;
 
     /** @var string Default access toke for tags requests */
-    public $accessToken;
+    protected $accessToken;
 
-    /** @var Request Object for creating request on Instagram API */
-    public $request;
+    /** @var RequestInterface Object for creating request on Instagram API */
+    protected $request;
+
+    /**
+     * @param string $clientId Your application client id
+     * @param string $clientSecret Your application client secret code
+     * @param RequestInterface $request Object for creating request on Instagram API
+     */
+    public function __construct($clientId, $clientSecret, RequestInterface $request)
+    {
+        $this->clientId = $clientId;
+        $this->clientSecret= $clientSecret;
+        $this->request = $request;
+    }
 
     /**
      * Find subscription identifier by media id
@@ -66,7 +76,7 @@ class Instagram extends CompressableService
         if (isset($this->accessToken)) {
             $url .= '?access_token='.$this->accessToken;
         } else {
-            $url .= '?client_id='.$this->appId;
+            $url .= '?client_id='.$this->clientId;
         }
     }
 
@@ -86,26 +96,6 @@ class Instagram extends CompressableService
     }
 
     /**
-     * Module initialization
-     * @param array $params
-     * @return bool
-     */
-    public function init(array $params = array())
-    {
-        // Create default or users Request object
-        $this->request = (!isset($this->request)) ? new Request() : new $this->request;
-
-        // If configuration for API Key is not set
-        if (!isset($this->appId) || !isset($this->appSecret)) {
-            // Signal error
-            Event::fire('error', array($this, 'Cannot initialize Instagram module - API keys does not exists'));
-        }
-
-        // Call parent initialization
-        return parent::init($params);
-    }
-
-    /**
      * Get list of instagram posts by tag
      * @param string $tag Tag for searching
      * @param array $params Collection or request parameters
@@ -114,7 +104,7 @@ class Instagram extends CompressableService
     public function listByTag($tag, $params = array())
     {
         $endpoint = '/tags/'.urlencode($tag).'/media/recent';
-        $url = $this->url.$endpoint;
+        $url = self::DEFAULT_URL.$endpoint;
 
         // Create url parameters string
         $paramsUrl = $this->paramsFromArray($params);
@@ -129,8 +119,11 @@ class Instagram extends CompressableService
         // Create signature
         $signature = $this->generateSig($endpoint, $params);
 
+        // Create final url
+        $url .= $paramsUrl.'&sig='.$signature;
+
         // Get API response
-        $response = $this->request->get($url.$paramsUrl.'&sig='.$signature);
+        $response = $this->request->get($url);
 
         // Return response decoded to associative array
         return json_decode($response, true);
@@ -145,15 +138,13 @@ class Instagram extends CompressableService
     public function likeMedia($id, $access_token, $method = 'POST')
     {
         $endpoint = '/media/'.$id.'/likes';
-        $url = $this->url.$endpoint;
 
         $sigParams = array('access_token' => $access_token);
         $signature = $this->generateSig($endpoint, $sigParams);
 
-        $url .= '?access_token='.$access_token.'&sig='.$signature;
-
         // Get API response
-        $response = $this->request->get($url, array(), $method);
+        $response = $this->request
+            ->get(self::DEFAULT_URL.$endpoint.'?access_token='.$access_token.'&sig='.$signature, array(), $method);
 
         // Return response decoded to associative array
         return json_decode($response, true);
@@ -167,7 +158,7 @@ class Instagram extends CompressableService
     public function mediaById($id)
     {
         $endpoint = '/media/'.urlencode($id);
-        $url = $this->url.$endpoint;
+        $url = self::DEFAULT_URL.$endpoint;
 
         $sigParams = array();
         // Create url for query
@@ -198,7 +189,7 @@ class Instagram extends CompressableService
     {
         // Set url options
         $endpoint = '/users/'.$user_id.'/relationship';
-        $url = $this->url.$endpoint;
+        $url = self::DEFAULT_URL.$endpoint;
         $signature = $this->generateSig($endpoint, array('access_token' => $access_token, 'action' => $action));
         $url .= '?access_token='.$access_token.'&sig='.$signature;
 
@@ -219,7 +210,7 @@ class Instagram extends CompressableService
     {
         // Set url options
         $endpoint = '/users/'.$user_id.'/relationship';
-        $url = $this->url.$endpoint;
+        $url = self::DEFAULT_URL.$endpoint;
         $signature = $this->generateSig($endpoint, array('access_token' => $access_token));
         $url .= '?access_token='.$access_token.'&sig='.$signature;
 
@@ -228,6 +219,7 @@ class Instagram extends CompressableService
 
         // Decode response to array
         $results = json_decode($response, true);
+
         return (isset($results['data']['outgoing_status']) && $results['data']['outgoing_status'] == 'follows');
     }
 
@@ -242,10 +234,10 @@ class Instagram extends CompressableService
      */
     public function subscribe($object, $aspect, $verify_token, $callback, $object_id = null)
     {
-        $url = $this->url.'/subscriptions';
+        $url = self::DEFAULT_URL.'/subscriptions';
         $post = array(
-            'client_id' => $this->appId,
-            'client_secret' => $this->appSecret,
+            'client_id' => $this->clientId,
+            'client_secret' => $this->clientSecret,
             'object' => $object,
             'aspect' => $aspect,
             'verify_token' => $verify_token,
@@ -268,7 +260,7 @@ class Instagram extends CompressableService
      */
     public function getSubscriptions()
     {
-        $url = $this->url.'/subscriptions?client_secret='.$this->appSecret.'&client_id='.$this->appId;
+        $url = self::DEFAULT_URL.'/subscriptions?client_secret='.$this->clientSecret.'&client_id='.$this->clientId;
 
         /// Get API response
         $response = $this->request->get($url);
@@ -286,7 +278,7 @@ class Instagram extends CompressableService
      */
     public function deleteSubscription($id = '', $object = 'all', $object_id = null)
     {
-        $url = $this->url.'/subscriptions?client_secret='.$this->appSecret.'&client_id='.$this->appId;
+        $url = self::DEFAULT_URL.'/subscriptions?client_secret='.$this->clientSecret.'&client_id='.$this->clientId;
 
         // Try to find subscription id by media id
         if (sizeof($object_id)) {
@@ -315,8 +307,8 @@ class Instagram extends CompressableService
         $url = 'https://api.instagram.com/oauth/access_token';
 
         $params = array(
-            'client_id' => $this->appId,
-            'client_secret' => $this->appSecret,
+            'client_id' => $this->clientId,
+            'client_secret' => $this->clientSecret,
             'grant_type' => 'authorization_code',
             'redirect_uri' => $redirect_url,
             'code' => $code
@@ -327,7 +319,7 @@ class Instagram extends CompressableService
         // Return response decoded to associative array
         return json_decode($response, true);
     }
-    
+
     /**
      * @param string $endpoint Method name
      * @param array $params Method params
@@ -339,6 +331,6 @@ class Instagram extends CompressableService
         foreach ($params as $key => $val) {
             $sig .= "|$key=$val";
         }
-        return hash_hmac('sha256', $sig, $this->appSecret, false);
+        return hash_hmac('sha256', $sig, $this->clientSecret, false);
     }
 }
