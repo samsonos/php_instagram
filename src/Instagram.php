@@ -160,6 +160,28 @@ class Instagram extends CompressableService
     }
 
     /**
+     * Get information about tag.
+     *
+     * @param string $tag Tag name
+     * @param string $access_token Users access token
+     * @return mixed
+     */
+    public function tag($tag, $access_token)
+    {
+        // Set url options
+        $endpoint = '/tags/'.$tag;
+        $url = $this->url.$endpoint;
+        $signature = $this->generateSig($endpoint, array('access_token' => $access_token));
+        $url .= '?access_token='.$access_token.'&sig='.$signature;
+
+        // Get API response
+        $response = $this->request->get($url);
+
+        // Return response decoded to associative array
+        return json_decode($response, true);
+    }
+    
+    /**
      * Find info about media
      * @param $id
      * @return mixed
