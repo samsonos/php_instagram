@@ -160,6 +160,30 @@ class Instagram extends CompressableService
     }
 
     /**
+     * Get list of users that liked current media.
+     *
+     * @param $id int Media identifier
+     * @param $access_token string Auth token
+     * @return mixed Request result
+     */
+    public function getLikes($id, $access_token)
+    {
+        $endpoint = '/media/' . $id . '/likes';
+        $url = $this->url . $endpoint;
+
+        $sigParams = array('access_token' => $access_token);
+        $signature = $this->generateSig($endpoint, $sigParams);
+
+        $url .= '?access_token=' . $access_token . '&sig=' . $signature;
+
+        // Get API response
+        $response = $this->request->get($url);
+
+        // Return response decoded to associative array
+        return json_decode($response, true);
+    }
+    
+    /**
      * Get information about tag.
      *
      * @param string $tag Tag name
