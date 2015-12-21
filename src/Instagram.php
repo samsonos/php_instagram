@@ -375,6 +375,29 @@ class Instagram extends CompressableService
     }
     
     /**
+     * Get info about access token owner.
+     *
+     * @param $access_token
+     * @return mixed
+     */
+    public function selfInfo($access_token)
+    {
+        $endpoint = '/users/self';
+        $url = $this->url . $endpoint;
+
+        $sigParams = array('access_token' => $access_token);
+        $signature = $this->generateSig($endpoint, $sigParams);
+
+        $url .= '?access_token=' . $access_token . '&sig=' . $signature;
+
+        // Get API response
+        $response = $this->request->get($url);
+
+        // Return response decoded to associative array
+        return json_decode($response, true);
+    }
+    
+    /**
      * @param string $endpoint Method name
      * @param array $params Method params
      * @return string Generated signature
