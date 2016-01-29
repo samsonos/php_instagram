@@ -64,9 +64,9 @@ class Instagram extends CompressableService
     protected function appendToken(& $url)
     {
         if (isset($this->accessToken)) {
-            $url .= '?access_token='.$this->accessToken;
+            $url .= '?access_token=' . $this->accessToken;
         } else {
-            $url .= '?client_id='.$this->appId;
+            $url .= '?client_id=' . $this->appId;
         }
     }
 
@@ -113,8 +113,8 @@ class Instagram extends CompressableService
      */
     public function listByTag($tag, $params = array())
     {
-        $endpoint = '/tags/'.urlencode($tag).'/media/recent';
-        $url = $this->url.$endpoint;
+        $endpoint = '/tags/' . urlencode($tag) . '/media/recent';
+        $url = $this->url . $endpoint;
 
         // Create url parameters string
         $paramsUrl = $this->paramsFromArray($params);
@@ -130,7 +130,7 @@ class Instagram extends CompressableService
         $signature = $this->generateSig($endpoint, $params);
 
         // Get API response
-        $response = $this->request->get($url.$paramsUrl.'&sig='.$signature);
+        $response = $this->request->get($url . $paramsUrl . '&sig=' . $signature);
 
         // Return response decoded to associative array
         return json_decode($response, true);
@@ -144,13 +144,13 @@ class Instagram extends CompressableService
      */
     public function likeMedia($id, $access_token, $method = 'POST')
     {
-        $endpoint = '/media/'.$id.'/likes';
-        $url = $this->url.$endpoint;
+        $endpoint = '/media/' . $id . '/likes';
+        $url = $this->url . $endpoint;
 
         $sigParams = array('access_token' => $access_token);
         $signature = $this->generateSig($endpoint, $sigParams);
 
-        $url .= '?access_token='.$access_token.'&sig='.$signature;
+        $url .= '?access_token=' . $access_token . '&sig=' . $signature;
 
         // Get API response
         $response = $this->request->get($url, array(), $method);
@@ -179,10 +179,11 @@ class Instagram extends CompressableService
         // Get API response
         $response = $this->request->get($url);
 
+
         // Return response decoded to associative array
         return json_decode($response, true);
     }
-    
+
     /**
      * Get information about tag.
      *
@@ -193,10 +194,10 @@ class Instagram extends CompressableService
     public function tag($tag, $access_token)
     {
         // Set url options
-        $endpoint = '/tags/'.$tag;
-        $url = $this->url.$endpoint;
+        $endpoint = '/tags/' . $tag;
+        $url = $this->url . $endpoint;
         $signature = $this->generateSig($endpoint, array('access_token' => $access_token));
-        $url .= '?access_token='.$access_token.'&sig='.$signature;
+        $url .= '?access_token=' . $access_token . '&sig=' . $signature;
 
         // Get API response
         $response = $this->request->get($url);
@@ -204,7 +205,7 @@ class Instagram extends CompressableService
         // Return response decoded to associative array
         return json_decode($response, true);
     }
-    
+
     /**
      * Find info about media
      * @param $id
@@ -212,8 +213,8 @@ class Instagram extends CompressableService
      */
     public function mediaById($id)
     {
-        $endpoint = '/media/'.urlencode($id);
-        $url = $this->url.$endpoint;
+        $endpoint = '/media/' . urlencode($id);
+        $url = $this->url . $endpoint;
 
         $sigParams = array();
         // Create url for query
@@ -224,7 +225,7 @@ class Instagram extends CompressableService
         $this->appendToken($url);
         $signature = $this->generateSig($endpoint, $sigParams);
 
-        $url .= '&sig='.$signature;
+        $url .= '&sig=' . $signature;
 
         // Get API response
         $response = $this->request->get($url);
@@ -243,10 +244,10 @@ class Instagram extends CompressableService
     public function setUserRelationship($user_id, $access_token, $action = 'follow')
     {
         // Set url options
-        $endpoint = '/users/'.$user_id.'/relationship';
-        $url = $this->url.$endpoint;
+        $endpoint = '/users/' . $user_id . '/relationship';
+        $url = $this->url . $endpoint;
         $signature = $this->generateSig($endpoint, array('access_token' => $access_token, 'action' => $action));
-        $url .= '?access_token='.$access_token.'&sig='.$signature;
+        $url .= '?access_token=' . $access_token . '&sig=' . $signature;
 
         // Get API response
         $response = $this->request->get($url, array('action' => $action), 'POST');
@@ -264,10 +265,10 @@ class Instagram extends CompressableService
     public function isFollowing($user_id, $access_token)
     {
         // Set url options
-        $endpoint = '/users/'.$user_id.'/relationship';
-        $url = $this->url.$endpoint;
+        $endpoint = '/users/' . $user_id . '/relationship';
+        $url = $this->url . $endpoint;
         $signature = $this->generateSig($endpoint, array('access_token' => $access_token));
-        $url .= '?access_token='.$access_token.'&sig='.$signature;
+        $url .= '?access_token=' . $access_token . '&sig=' . $signature;
 
         // Get API response
         $response = $this->request->get($url);
@@ -288,7 +289,7 @@ class Instagram extends CompressableService
      */
     public function subscribe($object, $aspect, $verify_token, $callback, $object_id = null)
     {
-        $url = $this->url.'/subscriptions';
+        $url = $this->url . '/subscriptions';
         $post = array(
             'client_id' => $this->appId,
             'client_secret' => $this->appSecret,
@@ -314,7 +315,7 @@ class Instagram extends CompressableService
      */
     public function getSubscriptions()
     {
-        $url = $this->url.'/subscriptions?client_secret='.$this->appSecret.'&client_id='.$this->appId;
+        $url = $this->url . '/subscriptions?client_secret=' . $this->appSecret . '&client_id=' . $this->appId;
 
         /// Get API response
         $response = $this->request->get($url);
@@ -332,7 +333,7 @@ class Instagram extends CompressableService
      */
     public function deleteSubscription($id = '', $object = 'all', $object_id = null)
     {
-        $url = $this->url.'/subscriptions?client_secret='.$this->appSecret.'&client_id='.$this->appId;
+        $url = $this->url . '/subscriptions?client_secret=' . $this->appSecret . '&client_id=' . $this->appId;
 
         // Try to find subscription id by media id
         if (sizeof($object_id)) {
@@ -340,7 +341,7 @@ class Instagram extends CompressableService
         }
 
         // Delete all subscriptions for selected parameter
-        $url .= sizeof($id) ? ('&id='.$id) : ('&object='.$object);
+        $url .= sizeof($id) ? ('&id=' . $id) : ('&object=' . $object);
 
         // Get API response
         $response = $this->request->get($url, array(), 'DELETE');
@@ -373,7 +374,7 @@ class Instagram extends CompressableService
         // Return response decoded to associative array
         return json_decode($response, true);
     }
-    
+
     /**
      * Get info about access token owner.
      *
@@ -396,13 +397,38 @@ class Instagram extends CompressableService
         // Return response decoded to associative array
         return json_decode($response, true);
     }
-    
+
+    /**
+     * Get recent medias by access token owner.
+     *
+     * @param $access_token
+     * @param array $params
+     * @return mixed
+     */
+    public function selfMedias($access_token, $params = array())
+    {
+        $endpoint = '/users/self/media/recent';
+        $url = $this->url . $endpoint;
+
+        // Create url parameters string
+        $paramsUrl = $this->paramsFromArray($params);
+        $params['access_token'] = $access_token;
+        $signature = $this->generateSig($endpoint, $params);
+
+        // Get API response
+        $response = $this->request->get($url . '?access_token=' . $access_token . $paramsUrl . '&sig=' . $signature);
+
+        // Return response decoded to associative array
+        return json_decode($response, true);
+    }
+
     /**
      * @param string $endpoint Method name
      * @param array $params Method params
      * @return string Generated signature
      */
-    public function generateSig($endpoint, $params = array()) {
+    public function generateSig($endpoint, $params = array())
+    {
         $sig = $endpoint;
         ksort($params);
         foreach ($params as $key => $val) {
