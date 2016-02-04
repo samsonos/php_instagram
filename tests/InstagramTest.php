@@ -129,7 +129,7 @@ class InstagramTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn($response);
 
-        $list = $this->instance->subscribe('object', 'aspect', 'verify_token', 'callback', 'object_id');
+        $list = $this->instance->subscribeOnEvent('object', 'aspect', 'verify_token', 'callback', 'object_id');
 
         // Perform test
         $this->assertEquals($list, json_decode($response));
