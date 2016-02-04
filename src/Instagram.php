@@ -287,7 +287,7 @@ class Instagram extends CompressableService
      * @param $object_id string Subscribing object identifier
      * @return mixed
      */
-    public function subscribe($object, $aspect, $verify_token, $callback, $object_id = null)
+    public function subscribeOnEvent($object, $aspect, $verify_token, $callback, $object_id = null)
     {
         $url = $this->url . '/subscriptions';
         $post = array(
