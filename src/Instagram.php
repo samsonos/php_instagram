@@ -336,12 +336,12 @@ class Instagram extends CompressableService
         $url = $this->url . '/subscriptions?client_secret=' . $this->appSecret . '&client_id=' . $this->appId;
 
         // Try to find subscription id by media id
-        if (sizeof($object_id)) {
+        if (count($object_id)) {
             $id = $this->findObjectFromSubscription($object_id);
         }
 
         // Delete all subscriptions for selected parameter
-        $url .= sizeof($id) ? ('&id=' . $id) : ('&object=' . $object);
+        $url .= !empty($id) ? ('&id=' . $id) : ('&object=' . $object);
 
         // Get API response
         $response = $this->request->get($url, array(), 'DELETE');
